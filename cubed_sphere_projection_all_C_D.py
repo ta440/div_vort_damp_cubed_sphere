@@ -1,6 +1,13 @@
-# Map onto the cubed-sphere.
-# Here, we analyse the equie-edge projection
-# which is the default for FV3.
+'''
+
+This script computes and saves important information
+relating to a cubed-sphere grid. 
+The user parameters are:
+a) Cubed-sphere mapping
+b) Resolution
+c) D- or C-grid (primary or dual)
+
+'''
 
 
 import numpy as np
@@ -28,44 +35,13 @@ grid = 'D'
 # Typically, set this as 2^n, n integer.
 C_N = 96
 
-
-##########################################
-
-# Helper functions:
-def xyz_to_lon_lat(x, y, z):
-    lamda = np.atan2(y, x)
-    phi = np.asin(z/np.sqrt(x**2 + y**2 + z**2))
-    
-    return lamda, phi
-
-def great_circle_dist(lamda_1, lamda_2, phi_1, phi_2):
-    return R*np.acos(np.cos(phi_1)*np.cos(phi_2)*np.cos(lamda_1 - lamda_2) + np.sin(phi_1)*np.sin(phi_2))
-
-def alpha_ijk(p_i, p_j, p_k):
-    # Compute the angle between three points,
-    # which are given by position vectors
-    # in Cartesian space
-    e_ji = np.cross(p_j, p_i)
-    e_jk = np.cross(p_j, p_k)
-    num = np.dot(e_ji, e_jk)
-    denom = np.dot(np.linalg.norm(e_ji),np.linalg.norm(e_jk))
-
-    return np.acos(num/denom)
-
-def gnomonic_proj(x_vals,y_vals,z_vals):
-    X = (R/r)*x_vals
-    Y = (R/r)*y_vals
-    Z = (R/r)*z_vals
-    return X, Y, Z
-
 ###########################################
 print('\n')
 print(f'Investigating the {grid}-grid')
 print(f'Resolution of C{C_N}')
 
-
 global R
-R = 6371.220 # Eaarth's radius in km
+R = 6371.220 # Earth's radius in km
 
 a = R/np.sqrt(3)
 
@@ -86,7 +62,19 @@ elif grid_type == 2:
     grid_name = 'Equiangular'
 print('\n')
 
-# Define the coordinates for the variable of choice
+###############################
+
+# Define the coordinates for the primary or dual mesh.
+
+# There are C_N values for the vorticity, which is 
+# stored at cell centres of the D-grid.
+
+# There are C_N + 1 values for the divergence, which
+# is stored at cell corners.
+
+# The dual grid for divergence is extended to compute
+# cell areas and alpha values.
+
 delta_omega = 2*omega_ref/C_N
 if grid == 'C':
     panel_vals = C_N + 1
@@ -97,6 +85,8 @@ elif grid == 'D':
     omegas = np.linspace(-omega_ref, omega_ref, panel_vals + 1)
 else:
     print('Incorrect grid type')
+
+################################
 
 if grid_type == 1:
     x = gamma*a*omegas
@@ -110,25 +100,6 @@ ad = np.ones_like(xd)*a
 
 global r
 r = np.sqrt(a**2 + xd**2 + yd**2)
-
-# Perform the gnomonic projection and obtain 
-# Cartesian coordinates:
-X1, Y1, Z1 = gnomonic_proj(ad, xd, yd)
-X2, Y2, Z2 = gnomonic_proj(-xd, ad, yd)
-X3, Y3, Z3 = gnomonic_proj(-ad, -xd, yd)
-X4, Y4, Z4 = gnomonic_proj(xd, -ad, yd)
-X5, Y5, Z5 = gnomonic_proj(-yd, xd, ad)
-X6, Y6, Z6 = gnomonic_proj(yd, xd, -ad)
-
-# Plot the six cubed-sphere faces:
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-surf1 = ax.plot3D(X1,Y1,Z1)
-surf2 = ax.plot3D(X2,Y2,Z2)
-surf3 = ax.plot3D(X3,Y3,Z3)
-surf4 = ax.plot3D(X4,Y4,Z4)
-surf5 = ax.plot3D(X5,Y5,Z5)
-surf6 = ax.plot3D(X6,Y6,Z6)
-plt.title('The cubed-sphere')
 
 #######################################
 # Perform an analysis on the first tile:

@@ -11,46 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import scipy
 import matplotlib.colors as colors
 
-##########################################
-
-# Helper functions:
-def xyz_to_lon_lat(x, y, z):
-    lamda = np.atan2(y, x)
-    phi = np.asin(z/np.sqrt(x**2 + y**2 + z**2))
-    
-    return lamda, phi
-
-def great_circle_dist(lamda_1, lamda_2, phi_1, phi_2):
-    return R*np.acos(np.cos(phi_1)*np.cos(phi_2)*np.cos(lamda_1 - lamda_2) + np.sin(phi_1)*np.sin(phi_2))
-
-def alpha_ijk(p_i, p_j, p_k):
-    # Compute the angle between three points,
-    # which are given by position vectors
-    # in Cartesian space
-    p1 = np.cross(p_i, p_j)
-    p2 = np.cross(p_j, p_k)
-    num = np.dot(p1,p2)
-    denom = np.dot(np.linalg.norm(p1),np.linalg.norm(p2))
-
-    # Sign hack for now ...
-    return np.acos(-num/denom)
-
-def alpha_ijk_points(p_i, p_j, p_k):
-    # Compute the angle between three points,
-    # which are given by position vectors
-    # in Cartesian space
-    A = p_i - p_j
-    B = p_k - p_j
-    num = np.dot(A,B)
-    denom = np.linalg.norm(A)*np.linalg.norm(B)
-
-    return np.acos(num/denom)
-
-def gnomonic_proj(r, x_vals, y_vals, z_vals):
-    X = (R/r)*x_vals
-    Y = (R/r)*y_vals
-    Z = (R/r)*z_vals
-    return X, Y, Z
+from functions import *
 
 ###########################################
 
