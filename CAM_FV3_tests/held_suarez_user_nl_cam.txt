@@ -1,2 +1,14 @@
 analytic_ic_type = 'held_suarez_1994'
   
+empty_htapes = .TRUE.
+write_nstep0 = .TRUE. ! Output the initial condition
+fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
+
+inithist='ENDOFRUN'
+
+NDENS= 2,2
+NHTFRQ = -720, -720 ! Output every 30 days
+MFILT = 100, 100
+avgflag_pertape = 'I', 'A'
+fincl1 = 'U', 'V', 'T', 'OMEGA', 'PS', 'PHIS', 'Z3','U850','V850','OMEGA850','T850'
+fincl2 = 'PS','T','U','V','OMEGA','PHIS','U850','V850','T850'
