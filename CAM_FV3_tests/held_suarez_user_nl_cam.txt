@@ -1,3 +1,6 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! For the spin-up simulation
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 analytic_ic_type = 'held_suarez_1994'
   
 empty_htapes = .TRUE.
@@ -12,3 +15,20 @@ MFILT = 100, 100
 avgflag_pertape = 'I', 'A'
 fincl1 = 'U', 'V', 'T', 'OMEGA', 'PS', 'PHIS', 'Z3','U850','V850','OMEGA850','T850'
 fincl2 = 'PS','T','U','V','OMEGA','PHIS','U850','V850','T850'
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! For the diffusion tests
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+empty_htapes = .TRUE.
+write_nstep0 = .TRUE. ! Output the initial condition
+fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
+
+NDENS= 2,2
+NHTFRQ = -6 ! Output every 0.25 days
+MFILT = 150
+
+avgflag_pertape = 'I'
+fincl1 = 'U', 'V', 'T', 'OMEGA', 'PS', 'PHIS', 'Z3','U850','V850','OMEGA850','T850'
+
+NCDATA='/glade/u/home/timand/restarts/cam_6_4_050_held_suarez_fv3_C96_spinup.cam.i.0001-12-27-00000.nc'
