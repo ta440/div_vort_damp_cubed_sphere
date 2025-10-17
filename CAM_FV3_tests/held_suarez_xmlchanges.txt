@@ -1,0 +1,17 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Commands for the spin-up simulation
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+./xmlchange DOUT_S=FALSE,\
+STOP_N=360,\
+REST_OPTION=none
+
+./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez --analytic_ic"
+
+./xmlchange JOB_WALLCLOCK_TIME = 02:00:00
+
+case.setup
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Commands for the 30 day diffusion tests
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
