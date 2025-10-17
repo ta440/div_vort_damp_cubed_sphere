@@ -15,3 +15,13 @@ case.setup
 !!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Commands for the 30 day diffusion tests
 !!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+./xmlchange DOUT_S=FALSE,\
+STOP_N=30,\
+REST_OPTION=none
+
+./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez"
+
+./xmlchange JOB_WALLCLOCK_TIME = 00:30:00
+
+./case.setup
