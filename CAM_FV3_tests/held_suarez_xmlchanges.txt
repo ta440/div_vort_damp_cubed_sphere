@@ -1,0 +1,32 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Commands for the spin-up simulation
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+./xmlchange DOUT_S=FALSE,\
+STOP_N=360,\
+REST_OPTION=none
+
+./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez --analytic_ic"
+
+./xmlchange JOB_WALLCLOCK_TIME=02:00:00
+
+./case.setup
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Commands for the 30 day diffusion tests
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+./xmlchange DOUT_S=FALSE,\
+STOP_N=30,\
+REST_OPTION=none
+
+./xmlchange RUN_TYPE='branch'
+
+./xmlchange RUN_REFCASE='/glade/u/home/timand/restarts/cam_6_4_050_held_suarez_fv3_C96_spinup.cam.i.0001-12-27-00000.nc'
+./xmlchange RUN_REFDATE='0001-12-27'
+
+./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez"
+
+./xmlchange JOB_WALLCLOCK_TIME=00:30:00
+
+./case.setup

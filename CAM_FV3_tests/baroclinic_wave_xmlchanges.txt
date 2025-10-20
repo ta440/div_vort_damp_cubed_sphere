@@ -1,0 +1,16 @@
+./xmlchange DOUT_S=FALSE,\
+STOP_N=15,\
+REST_OPTION=none
+./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys adiabatic --analytic_ic"
+./xmlchange JOB_WALLCLOCK_TIME=00:30:00
+
+! Change time step if necessary for different resolutions
+# C48, C96 use default of ATM_NCPL=48
+
+# C192
+./xmlchange ATM_NCPL=96
+./xmlchange NTASKS=3072
+
+# C384 needs the timestep decreased by a factor of 4.
+./xmlchange ATM_NCPL=384
+./xmlchange NTASKS=3072
