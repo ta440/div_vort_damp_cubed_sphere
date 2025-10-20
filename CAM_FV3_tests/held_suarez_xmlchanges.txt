@@ -20,7 +20,7 @@ REST_OPTION=end
 STOP_N=30,\
 REST_OPTION=none
 
-./xmlchange RUN_TYPE='branch'
+./xmlchange RUN_TYPE=branch
 
 ./xmlchange RUN_REFCASE='cam_6_4_050_held_suarez_fv3_C96_spinup'
 ./xmlchange RUN_REFDATE='0001-12-27'
