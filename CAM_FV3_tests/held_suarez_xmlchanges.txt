@@ -4,7 +4,7 @@
 
 ./xmlchange DOUT_S=FALSE,\
 STOP_N=360,\
-REST_OPTION=none
+REST_OPTION=end
 
 ./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez --analytic_ic"
 
@@ -22,7 +22,7 @@ REST_OPTION=none
 
 ./xmlchange RUN_TYPE='branch'
 
-./xmlchange RUN_REFCASE='/glade/u/home/timand/restarts/cam_6_4_050_held_suarez_fv3_C96_spinup.cam.i.0001-12-27-00000.nc'
+./xmlchange RUN_REFCASE='cam_6_4_050_held_suarez_fv3_C96_spinup'
 ./xmlchange RUN_REFDATE='0001-12-27'
 
 ./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez"
