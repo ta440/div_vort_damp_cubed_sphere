@@ -26,6 +26,9 @@ empty_htapes = .TRUE.
 write_nstep0 = .TRUE. ! Output the initial condition
 fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
 
+! If using the equiangular grid (equi-edge is default of fv3_grid_type=0)
+!fv3_grid_type = 2
+
 NDENS= 2,2
 NHTFRQ = -6 ! Output every 0.25 days
 MFILT = 150
@@ -75,3 +78,24 @@ fv3_hord_tr = 8
 !fv3_hord_tm = 8
 !fv3_hord_dp = 8
 !fv3_hord_tr = 8
+
+! Changes to divergence damping !!!!!!!!!!!!
+
+! 2nd order
+!fv3_nord = 0
+!fv3_d4_bg = 0.0
+!fv3_d2_bg = 0.297
+
+! 4th-order
+!fv3_nord = 1
+!fv3_d4_bg = 
+
+! 6th-order
+!fv3_nord=2
+!fv3_d4_bg = 
+
+! 8th-order
+!fv3_nord=3
+!fv3_d4_bg = 0.174
+
+! Changes to vorticity damping !!!!!!!!!!!!!!
