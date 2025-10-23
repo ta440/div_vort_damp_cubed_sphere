@@ -22,7 +22,10 @@ REST_OPTION=none
 
 ./xmlchange RUN_TYPE=branch
 
+! Link to the spinup case, e.g
 ./xmlchange RUN_REFCASE='cam_6_4_050_held_suarez_fv3_C96_spinup'
+./xmlchange RUN_REFCASE='cam_6_4_050_held_suarez_fv3_C96_spinup_equiangular'
+
 ./xmlchange RUN_REFDATE='0001-12-27'
 
 ./xmlchange --file env_build.xml --id CAM_CONFIG_OPTS --val "--phys held_suarez"
