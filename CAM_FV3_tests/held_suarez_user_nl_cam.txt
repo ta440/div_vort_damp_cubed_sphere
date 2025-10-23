@@ -7,6 +7,9 @@ empty_htapes = .TRUE.
 write_nstep0 = .TRUE. ! Output the initial condition
 fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
 
+! If using the equiangular grid (equi-edge is default of fv3_grid_type=0)
+!fv3_grid_type = 2
+
 inithist='ENDOFRUN'
 
 NDENS= 2,2
