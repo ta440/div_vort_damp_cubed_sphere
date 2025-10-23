@@ -10,6 +10,9 @@ fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
 ! If using the equiangular grid (equi-edge is default of fv3_grid_type=0)
 !fv3_grid_type = 2
 
+! Reduce the diffusion coefficient if using the equiangular grid
+!fv3_d4_bg = 0.13
+
 inithist='ENDOFRUN'
 
 NDENS= 2,2
