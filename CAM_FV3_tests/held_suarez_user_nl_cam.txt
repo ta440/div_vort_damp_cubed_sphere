@@ -107,8 +107,8 @@ fv3_hord_tr = 8
 ! Changes to vorticity damping !!!!!!!!!!!!!!
 !fv3_do_vort_damp=.TRUE. ! Switch on vorticity damping
 
-! If using equiangular, reduce the divergence damping coefficient
-fv3_d4_bg = 0.13
+! If using the equiangular mapping, reduce the divergence damping coefficient
+!fv3_d4_bg = 0.13
 
 !fv3_nord = 1
 !fv3_vtdm4 = 0.106
