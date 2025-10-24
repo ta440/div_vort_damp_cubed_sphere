@@ -7,6 +7,12 @@ empty_htapes = .TRUE.
 write_nstep0 = .TRUE. ! Output the initial condition
 fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
 
+! If using the equiangular grid (equi-edge is default of fv3_grid_type=0)
+!fv3_grid_type = 2
+
+! Reduce the diffusion coefficient if using the equiangular grid
+!fv3_d4_bg = 0.13
+
 inithist='ENDOFRUN'
 
 NDENS= 2,2
@@ -17,12 +23,17 @@ fincl1 = 'U', 'V', 'T', 'OMEGA', 'PS', 'PHIS', 'Z3','U850','V850','OMEGA850','T8
 fincl2 = 'PS','T','U','V','OMEGA','PHIS','U850','V850','T850'
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! For the diffusion tests
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 empty_htapes = .TRUE.
 write_nstep0 = .TRUE. ! Output the initial condition
 fv3_hydrostatic = .TRUE. ! set to FALSE for nonhydrostatic, TRUE for hydrostatic
+
+! If using the equiangular grid (equi-edge is default of fv3_grid_type=0)
+!fv3_grid_type = 2
 
 NDENS= 2,2
 NHTFRQ = -6 ! Output every 0.25 days
@@ -31,4 +42,76 @@ MFILT = 150
 avgflag_pertape = 'I'
 fincl1 = 'U', 'V', 'T', 'OMEGA', 'PS', 'PHIS', 'Z3','U850','V850','OMEGA850','T850'
 
-NCDATA='/glade/u/home/timand/restarts/cam_6_4_050_held_suarez_fv3_C96_spinup.cam.i.0001-12-27-00000.nc'
+! Horizontal transport schemes !!!!!!!!!!!!!!!!!!
+
+! Default (also called 'Traditional Climate')
+! A Hunyh monotonicity constraint when conditions are met, otherwise unlimited
+fv3_hord_mt = 10
+fv3_hord_vt = 10
+fv3_hord_tm = 10
+fv3_hord_dp = -10
+fv3_hord_tr = 8
+
+! Effectively-inviscid (also called 'Traditional Weather')
+! Unlimited fifth-order PPM scheme with 2dx limiter
+!fv3_hord_mt = 5
+!fv3_hord_vt = 5
+!fv3_hord_tm = 5
+!fv3_hord_dp = -5
+!fv3_hord_tr = -5
+
+! Hunyh monotonicity always used
+!fv3_hord_mt = 9
+!fv3_hord_vt = 9
+!fv3_hord_tm = 9
+!fv3_hord_dp = 9
+! Choose one of the following:
+!fv3_hord_tr = 8
+!fv3_hord_tr = 9
+
+! Minimally diffusive/ intermediate strength monotonicity
+! At sixes and sevens!
+!fv3_hord_mt = 6
+!fv3_hord_vt = 6
+!fv3_hord_tm = 6
+!fv3_hord_dp = 7
+!fv3_hord_tr = 7
+
+! Lin 2004 monotone PPM
+! Quite fast but also quite diffusive
+!fv3_hord_mt = 8
+!fv3_hord_vt = 8
+!fv3_hord_tm = 8
+!fv3_hord_dp = 8
+!fv3_hord_tr = 8
+
+! Changes to divergence damping !!!!!!!!!!!!
+
+! 2nd order
+!fv3_nord = 0
+!fv3_d4_bg = 0.0
+!fv3_d2_bg = 0.297
+
+! 4th-order
+!fv3_nord = 1
+!fv3_d4_bg = 
+
+! 6th-order
+!fv3_nord=2
+!fv3_d4_bg = 
+
+! 8th-order
+!fv3_nord=3
+!fv3_d4_bg = 0.174
+
+! Changes to vorticity damping !!!!!!!!!!!!!!
+!fv3_do_vort_damp=.TRUE. ! Switch on vorticity damping
+
+! If using the equiangular mapping, reduce the divergence damping coefficient
+!fv3_d4_bg = 0.13
+
+!fv3_nord = 1
+!fv3_vtdm4 = 0.106
+
+!fv3_nord = 2
+!fv3_vtdm4 = 0.118
