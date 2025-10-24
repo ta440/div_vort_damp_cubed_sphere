@@ -18,13 +18,17 @@ from functions import *
 #####################################
 
 # Choose the grid resolution:
-C_N = 48
+C_N = 96
 
 # CHoose the order of damping:
-q = 3
+q = 4
 
 # Diffusion coefficients for each mapping
 # Use the opscillation-free here:
+
+# For C192:
+
+# For C96:
 C_distant = 0.144
 C_angular = 0.117
 C_edge = 0.144
@@ -101,17 +105,56 @@ edge_2dx_damp =  two_dx_damp(q, C_edge, mean_sina_edge, areas_edge, chi_edge)
 
 ########################################
 
+cmap_surface = 'jet'
+
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-surf = ax.plot_surface(x_2d, y_2d, distant_2dx_damp, cmap='coolwarm', linewidth=0, vmin=0, vmax=1)
+surf = ax.plot_surface(x_2d, y_2d, distant_2dx_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 ax.set_zlim(0, 1)
 
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-surf = ax.plot_surface(x_2d, y_2d, angular_2dx_damp, cmap='coolwarm', linewidth=0, vmin=0, vmax=1)
+surf = ax.plot_surface(x_2d, y_2d, angular_2dx_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 ax.set_zlim(0, 1)
 
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-surf = ax.plot_surface(x_2d, y_2d, edge_2dx_damp, cmap='coolwarm', linewidth=0, vmin=0, vmax=1)
+surf = ax.plot_surface(x_2d, y_2d, edge_2dx_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 ax.set_zlim(0, 1)
+
+# All in one.
+fig, axes = plt.subplots(1,3, figsize=(18,5.5), constrained_layout=True, subplot_kw={"projection": "3d"})
+(ax1,ax2,ax3) = axes
+surf1 = ax1.plot_surface(x_2d, y_2d, distant_2dx_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+surf2 = ax2.plot_surface(x_2d, y_2d, angular_2dx_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+surf3 = ax3.plot_surface(x_2d, y_2d, edge_2dx_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+ax1.set_zlim(0, 1)
+ax2.set_zlim(0, 1)
+ax3.set_zlim(0, 1)
+
+big_size=18
+smaller_size=16
+
+ax.tick_params(labelsize=14)
+
+ax1.set_xlabel(f'$x$ index', size=smaller_size)
+ax2.set_xlabel(f'$x$ index', size=smaller_size)
+ax3.set_xlabel(f'$x$ index', size=smaller_size)
+
+ax1.set_ylabel(f'$y$ index', size=smaller_size)
+ax2.set_ylabel(f'$y$ index', size=smaller_size)
+ax3.set_ylabel(f'$y$ index', size=smaller_size)
+
+ax1.set_zlabel('$\Gamma(\pi, \pi)$', size=smaller_size)
+ax2.set_zlabel('$\Gamma(\pi, \pi)$', size=smaller_size)
+ax3.set_zlabel('$\Gamma(\pi, \pi)$', size=smaller_size)
+
+ax1.set_title(f'Equidistant \n max($\Gamma(\pi, \pi)$) = {np.round(np.max(distant_2dx_damp),3)}', size=big_size)
+ax2.set_title(f'Equiangular \n max($\Gamma(\pi, \pi)$) = {np.round(np.max(angular_2dx_damp),3)}', size=big_size)
+ax3.set_title(f'Equi-edge \n max($\Gamma(\pi, \pi)$) = {np.round(np.max(edge_2dx_damp),3)}', size=big_size)
+
+# Save this figure:
+savename = f'figures/two_dx_damp_over_panel_q{q}.jpg'
+
+print(f'saving file to {savename}')
+plt.savefig(savename)
 
 # Alternatively, plot flat:
 fig, axes = plt.subplots(1,3, figsize=(12,5), sharey=True, constrained_layout=True)

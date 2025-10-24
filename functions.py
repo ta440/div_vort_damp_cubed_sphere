@@ -1,11 +1,11 @@
 '''
-Helpful functions for the cubed-sphere mappings
+Helpful functions for the cubed-sphere mappings.
 
 '''
 import numpy as np
 
 def xyz_to_lon_lat(x, y, z):
-    # Convert from Cartesian to lon-lat
+    # Convert from Cartesian to lon-lat coordinats
     lamda = np.arctan2(y, x)
     phi = np.arcsin(z/np.sqrt(x**2 + y**2 + z**2))
     
@@ -28,7 +28,8 @@ def alpha_ijk(p_i, p_j, p_k):
 
 def gnomonic_proj(r, R, x_vals, y_vals, z_vals):
     # Project the 2D panel coordinates onto the sphere
-    # as 3D Cartesian coordinates
+    # as 3D Cartesian coordinates.
+    # R is the radius, r = sqrt(a**2 + x**2 + y**2)
     X = (R/r)*x_vals
     Y = (R/r)*y_vals
     Z = (R/r)*z_vals

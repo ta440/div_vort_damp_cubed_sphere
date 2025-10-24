@@ -35,7 +35,7 @@ C8 = 0.15
 # Option 0 is equi-edge
 # This is following the fv3 naming convention
 
-projection_opt = 2
+projection_opt = 0
 
 if projection_opt == 1:
     chi = 1.0
@@ -60,16 +60,16 @@ if C_val == 'default':
     C4 = 0.15
     C6 = 0.15
     C8 = 0.15
-else:
+elif C_val == 'strong':
     if projection_opt == 2:
         C2 = 0.1181712048873376
-        C2_sponge = 0.15
+        C2_sponge = 0.1181712048873376
         C4 = 0.1181712048873376
         C6 = 0.1181712048873376
         C8 = 0.1181712048873376
     else:
         C2 = 0.14368992448310153
-        C2_sponge = 0.15
+        C2_sponge = 0.14368992448310153
         C4 = 0.14368992448310153
         C6 = 0.14368992448310153
         C8 = 0.14368992448310153
@@ -170,37 +170,36 @@ surf.cmap.set_under('k')
 # We take a slice along the diagonal in wavenumber space
 # with k delta x = l delta y.
 
+line_width = 2
 
 ndx = 2*np.pi/k_dx
 
 plt.figure(figsize=(8,6))
 #plt.plot(k_dx, amp_fact_2.diagonal(), label='2nd order')
-plt.plot(k_dx, amp_fact_2_sponge.diagonal(), label='2nd order sponge')
-plt.plot(k_dx, amp_fact_4.diagonal(), label='4th order')
-plt.plot(k_dx, amp_fact_6.diagonal(), label='6th order')
-plt.plot(k_dx, amp_fact_8.diagonal(), label='8th order')
+plt.plot(k_dx, amp_fact_2_sponge.diagonal(), label='2nd order sponge', c='b', linewidth=line_width)
+plt.plot(k_dx, amp_fact_4.diagonal(), label='4th order', c='g', linestyle='dashed', linewidth=line_width)
+plt.plot(k_dx, amp_fact_6.diagonal(), label='6th order', c='r', linestyle='dotted', linewidth=line_width)
+plt.plot(k_dx, amp_fact_8.diagonal(), label='8th order', c='orange', linestyle='dashdot', linewidth=line_width)
 #plt.title(f'{grid_name}, default CAM divergence damping coefficients')
 plt.plot(k_dx, np.zeros_like(k_dx), linestyle='--', c='k')
 plt.plot(k_dx, -np.ones_like(k_dx), linestyle='-', c='k')
-plt.xlabel('Normalised wavenumber, k\u0394x', size=title_size)
-plt.ylabel('Amplification factor', size=title_size)
+plt.xlabel('Normalised wavenumber, k\u0394x', size=16)
+plt.ylabel('Amplification factor', size=16)
 plt.xlim(0,np.pi)
-plt.xticks(fontsize=smaller_size)
-plt.yticks(fontsize=smaller_size)
-plt.legend(fontsize=smaller_size,loc='lower left')
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.legend(fontsize=14,loc='lower left',framealpha=1)
 ax = plt.gca()
 ax.xaxis.set_major_formatter(plt.FuncFormatter(
    lambda val,pos: '{:.0g}$\pi$'.format(val/np.pi) if val !=0 else '0'
 ))
 ax.xaxis.set_major_locator(plt.MultipleLocator(base=0.1*np.pi))
 
-
-
-plt.figure()
-plt.plot(k_dx, amp_fact_2.diagonal(), label='2nd order')
-plt.plot(k_dx, amp_fact_4.diagonal(), label='4th order')
-plt.plot(k_dx, amp_fact_6.diagonal(), label='6th order')
-plt.plot(k_dx, amp_fact_8.diagonal(), label='8th order')
+plt.figure(figsize=(8,6))
+plt.plot(k_dx, amp_fact_2.diagonal(), label='2nd order', c='b', linewidth=line_width)
+plt.plot(k_dx, amp_fact_4.diagonal(), label='4th order', c='g', linestyle='dashed', linewidth=line_width)
+plt.plot(k_dx, amp_fact_6.diagonal(), label='6th order', c='r', linestyle='dotted', linewidth=line_width)
+plt.plot(k_dx, amp_fact_8.diagonal(), label='8th order', c='orange', linestyle='dashdot', linewidth=line_width)
 #plt.title(f'{grid_name}, divergence damping for stronger stability divergence damping')
 plt.plot(k_dx, np.zeros_like(k_dx), linestyle='--', c='k')
 plt.xlabel('Normalised wavenumber, k\u0394x', size=title_size)

@@ -24,7 +24,7 @@ from os.path import abspath, dirname
 # User-defined parameters:
 
 # Choose grid for storing prognostic at cell centre
-grid = 'C'
+grid = 'D'
 
 # Choose the resolution by number of edges
 # on each panel of the cubed-sphere
