@@ -67,15 +67,17 @@ surf4 = ax.scatter(X1[x_index, y_index+ 1], Y1[x_index, y_index+ 1], Z1[x_index,
 
 ###########################
 # Look at point 1 and compute basis vectors
+
 e12 = np.cross(p1, p2)/np.linalg.norm(np.cross(p1, p2))
+#e12 = np.cross(p2, p1)/np.linalg.norm(np.cross(p2, p1))
 
-
-#e14 = np.cross(p1, p4)/np.linalg.norm(np.cross(p1, p4))
-e14 = np.cross(p4, p1)/np.linalg.norm(np.cross(p4, p1))
+e14 = np.cross(p1, p4)/np.linalg.norm(np.cross(p1, p4))
+#e14 = np.cross(p4, p1)/np.linalg.norm(np.cross(p4, p1))
 
 
 # What is the angle between these?
-#alpha_412 = np.dot(e12, e14)
+alpha_412 = np.arccos(np.dot(e12, e14))
+print(alpha_412*180/np.pi)
 
 # Convert to degrees also
 alpha_123 = alpha_ijk(p1, p2, p3)
@@ -104,6 +106,7 @@ ax.scatter(X1[x_index+ 1, y_index+ 1], Y1[x_index+ 1, y_index+ 1], Z1[x_index+ 1
 ax.scatter(X1[x_index, y_index+ 1], Y1[x_index, y_index+ 1], Z1[x_index, y_index+ 1], c='r')
 ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], e12[0], e12[1], e12[2], length=50, normalize=True, color='b')
 ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], e14[0], e14[1], e14[2], length=50, normalize=True, color='r')
+ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2], length=50, normalize=True, color='b')
 
 
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
