@@ -1,8 +1,7 @@
 '''
-A plotting script to compare all orders of divergence damping.
-Here, we examine the baroclinc wave test case.
-
-
+A plotting script to compare divergence damping instabilities
+on the equiangular and equi-edge grids, for the JW2006 
+baroclinic wave test.
 '''
 
 import numpy as np
