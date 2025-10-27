@@ -1,8 +1,14 @@
-# This script compares gnomonic cubed-sphere mappings.
-# Here, we compare grids from three different methods:
-# 1. Equidistant
-# 2. Equiangular
-# 3. Equi-edge
+'''
+This script compares the three gnomonic cubed-sphere mappings:
+1. Equidistant
+2. Equiangular
+3. Equi-edge
+
+These are plotted in 3D space.
+Comparisons of the panels in 2D Cartesian space,
+and projected onto the cubed-sphere are shown.
+
+'''
 
 
 import numpy as np

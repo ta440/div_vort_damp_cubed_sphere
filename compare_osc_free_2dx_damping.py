@@ -20,7 +20,7 @@ from functions import *
 # Choose the grid resolution:
 C_N = 96
 
-# CHoose the order of damping:
+# Choose the order of damping:
 q = 4
 
 # Diffusion coefficients for each mapping

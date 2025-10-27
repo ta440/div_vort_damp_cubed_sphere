@@ -15,6 +15,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import scipy
 import matplotlib.colors as colors
+from functions import *
 
 ##########################################
 # User-defined parameters:
@@ -40,7 +41,6 @@ print('\n')
 print(f'Investigating the {grid}-grid')
 print(f'Resolution of C{C_N}')
 
-global R
 R = 6371.220 # Earth's radius in km
 
 a = R/np.sqrt(3)
@@ -98,11 +98,11 @@ else:
 xd, yd = np.meshgrid(x,y)
 ad = np.ones_like(xd)*a
 
-global r
 r = np.sqrt(a**2 + xd**2 + yd**2)
 
 #######################################
 # Perform an analysis on the first tile:
+X1, Y1, Z1 = gnomonic_proj(r, R, ad, xd, yd)
 
 # Convert the local Cartesian coordinates to lon-lat
 LON, LAT = xyz_to_lon_lat(X1,Y1,Z1)
@@ -126,9 +126,9 @@ mean_sina = np.zeros((panel_vals,panel_vals))
 for i in np.arange(panel_vals + 1):
     for j in np.arange(panel_vals + 1):
         if j != panel_vals:
-            dx_vals[i,j] = great_circle_dist(LON[i,j], LON[i, j+1], LAT[i, j], LAT[i, j+1])
+            dx_vals[i,j] = great_circle_dist(LON[i,j], LON[i, j+1], LAT[i, j], LAT[i, j+1], R)
         if i != panel_vals:
-            dy_vals[i,j] = great_circle_dist(LON[i,j], LON[i+1, j], LAT[i, j], LAT[i+1, j])
+            dy_vals[i,j] = great_circle_dist(LON[i,j], LON[i+1, j], LAT[i, j], LAT[i+1, j], R)
         if i != panel_vals and j != panel_vals:
             # Compute angles in Cartesian coordinates
             point1 = np.array([X1[i,j], Y1[i,j], Z1[i,j]])

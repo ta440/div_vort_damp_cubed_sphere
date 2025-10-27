@@ -77,10 +77,10 @@ elif C_val == 'strong':
 #########################################
 
 # Investigate the amplification factors in the 
-# range of k*dx, l*dy in [0,pi]
-k_spacing = 100
-k_dx = np.linspace(0, np.pi, k_spacing)
-l_dy = np.linspace(0, np.pi, k_spacing)
+# range of k*dx, l*dy in [0,pi].
+# There are Cx resolvable wavenumbers in each dimension.
+k_dx = np.linspace(0, np.pi, Cx)
+l_dy = np.linspace(0, np.pi, Cx)
 
 KDX, LDY = np.meshgrid(k_dx, l_dy)
 

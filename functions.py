@@ -22,7 +22,7 @@ def alpha_ijk(p_i, p_j, p_k):
     e_ji = np.cross(p_j, p_i)
     e_jk = np.cross(p_j, p_k)
     num = np.dot(e_ji, e_jk)
-    denom = np.dot(np.linalg.norm(e_ji),np.linalg.norm(e_jk))
+    denom = np.dot(np.linalg.norm(e_ji), np.linalg.norm(e_jk))
 
     return np.arccos(num/denom)
 
