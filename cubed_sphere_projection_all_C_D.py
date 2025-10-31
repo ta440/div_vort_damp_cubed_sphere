@@ -26,10 +26,10 @@ from functions import *
 # 1 is for equidistant
 # 2 is for equiangular
 
-grid_type = 0
+grid_type = 2
 
 # Choose grid for storing prognostic at cell centre
-grid = 'offset'
+grid = 'primary'
 
 # Choose the resolution by number of edges
 # on each panel of the cubed-sphere
