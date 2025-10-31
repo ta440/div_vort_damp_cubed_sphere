@@ -18,7 +18,7 @@ import matplotlib.colors as colors
 
 # Define the grid resolution cubed-sphere
 # as number of cells per edge
-res = 96
+res = 192
 
 R = 6371.220 # Earth's radius in km
 
@@ -35,19 +35,20 @@ C8 = 0.15
 # Option 0 is equi-edge
 # This is following the fv3 naming convention
 
-projection_opt = 0
+projection_opt = 2
 
+# Use exact values - close enough
 if projection_opt == 1:
     chi = 1.0
-    sin_a = 0.86992878
+    sin_a = np.sqrt(3)/2
     grid_name = 'Equidistant'
 elif projection_opt == 2:
-    chi = 1.40276798
-    sin_a = 0.99996708
+    chi = np.sqrt(2)
+    sin_a = 1.0
     grid_name = 'Equiangular'
 elif projection_opt == 0:
     chi = 1.0
-    sin_a = 0.86992878
+    sin_a = np.sqrt(3)/2
     grid_name = 'Equi-edge'
 
 C_val = 'default'
@@ -62,25 +63,25 @@ if C_val == 'default':
     C8 = 0.15
 elif C_val == 'strong':
     if projection_opt == 2:
-        C2 = 0.1181712048873376
-        C2_sponge = 0.1181712048873376
-        C4 = 0.1181712048873376
-        C6 = 0.1181712048873376
-        C8 = 0.1181712048873376
+        C2 = 0.117
+        C2_sponge = 0.117
+        C4 = 0.117
+        C6 = 0.117
+        C8 = 0.117
     else:
-        C2 = 0.14368992448310153
-        C2_sponge = 0.14368992448310153
-        C4 = 0.14368992448310153
-        C6 = 0.14368992448310153
-        C8 = 0.14368992448310153
+        C2 = 0.144
+        C2_sponge = 0.144
+        C4 = 0.144
+        C6 = 0.144
+        C8 = 0.144
 
 #########################################
 
 # Investigate the amplification factors in the 
 # range of k*dx, l*dy in [0,pi].
 # There are Cx resolvable wavenumbers in each dimension.
-k_dx = np.linspace(0, np.pi, Cx)
-l_dy = np.linspace(0, np.pi, Cx)
+k_dx = np.linspace(0, np.pi, res)
+l_dy = np.linspace(0, np.pi, res)
 
 KDX, LDY = np.meshgrid(k_dx, l_dy)
 

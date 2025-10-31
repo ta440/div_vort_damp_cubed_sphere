@@ -140,9 +140,9 @@ angular_damp = np.zeros((C_N, C_N))
 edge_damp = np.zeros((C_N, C_N))
 
 for i in np.arange(C_N):
-    distant_damp[:, i] = gamma_along_x(q, C_distant, k_dx,  mean_sina_distant[i,i], areas_distant[i,i], np.min(areas_distant), chi_distant[i,i])
-    angular_damp[:, i] =  gamma_along_x(q, C_angular, k_dx, mean_sina_angular[cent_ind, i], areas_angular[cent_ind, i], np.min(areas_angular), chi_angular[cent_ind, i])
-    edge_damp[:,i] =  gamma_along_x(q, C_edge, k_dx, mean_sina_edge[i,i], areas_edge[i,i], np.min(areas_edge), chi_edge[i,i])
+    distant_damp[i, :] = gamma_along_x(q, C_distant, k_dx,  mean_sina_distant[i,i], areas_distant[i,i], np.min(areas_distant), chi_distant[i,i])
+    angular_damp[i, :] =  gamma_along_x(q, C_angular, k_dx, mean_sina_angular[cent_ind, i], areas_angular[cent_ind, i], np.min(areas_angular), chi_angular[cent_ind, i])
+    edge_damp[i, :] =  gamma_along_x(q, C_edge, k_dx, mean_sina_edge[i,i], areas_edge[i,i], np.min(areas_edge), chi_edge[i,i])
 
 ########################################
 
@@ -159,6 +159,16 @@ ax.set_zlim(0, 1)
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 surf = ax.plot_surface(K_DX, X, edge_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 ax.set_zlim(0, 1)
+
+# All in one.
+fig, axes = plt.subplots(1,3, figsize=(18,5.5), constrained_layout=True, subplot_kw={"projection": "3d"})
+(ax1,ax2,ax3) = axes
+surf1 = ax1.plot_surface(K_DX, X, distant_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+surf2 = ax2.plot_surface(K_DX, X, angular_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+surf3 = ax3.plot_surface(K_DX, X, edge_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+ax1.set_zlim(0, 1)
+ax2.set_zlim(0, 1)
+ax3.set_zlim(0, 1)
 
 
 

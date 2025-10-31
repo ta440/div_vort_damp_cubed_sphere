@@ -69,10 +69,16 @@ surf4 = ax.scatter(X1[x_index, y_index+ 1], Y1[x_index, y_index+ 1], Z1[x_index,
 # Look at point 1 and compute basis vectors
 
 e12 = np.cross(p1, p2)/np.linalg.norm(np.cross(p1, p2))
-#e12 = np.cross(p2, p1)/np.linalg.norm(np.cross(p2, p1))
+e21 = np.cross(p2, p1)/np.linalg.norm(np.cross(p2, p1))
+
+e23 = np.cross(p2, p3)/np.linalg.norm(np.cross(p2, p3))
+e32 = np.cross(p3, p2)/np.linalg.norm(np.cross(p3, p2))
+
+e34 = np.cross(p3, p4)/np.linalg.norm(np.cross(p3, p4))
+e43 = np.cross(p4, p3)/np.linalg.norm(np.cross(p4, p3))
 
 e14 = np.cross(p1, p4)/np.linalg.norm(np.cross(p1, p4))
-#e14 = np.cross(p4, p1)/np.linalg.norm(np.cross(p4, p1))
+e41 = np.cross(p4, p1)/np.linalg.norm(np.cross(p4, p1))
 
 
 # What is the angle between these?
@@ -105,9 +111,29 @@ ax.scatter(X1[x_index+ 1, y_index], Y1[x_index+ 1, y_index], Z1[x_index+ 1, y_in
 ax.scatter(X1[x_index+ 1, y_index+ 1], Y1[x_index+ 1, y_index+ 1], Z1[x_index+ 1, y_index+ 1], c='k')
 ax.scatter(X1[x_index, y_index+ 1], Y1[x_index, y_index+ 1], Z1[x_index, y_index+ 1], c='r')
 ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], e12[0], e12[1], e12[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index +1, y_index], Y1[x_index+1, y_index], Z1[x_index+1, y_index], e23[0], e23[1], e23[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index+1, y_index+1], Y1[x_index+1, y_index+1], Z1[x_index+1, y_index+1], e34[0], e34[1], e34[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index, y_index+1], Y1[x_index, y_index+1], Z1[x_index, y_index+1], e41[0], e41[1], e41[2], length=50, normalize=True, color='b')
 ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], e14[0], e14[1], e14[2], length=50, normalize=True, color='r')
-ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index +1, y_index], Y1[x_index+1, y_index], Z1[x_index+1, y_index], e21[0], e21[1], e21[2], length=50, normalize=True, color='r')
+ax.quiver(X1[x_index+1, y_index+1], Y1[x_index+1, y_index+1], Z1[x_index+1, y_index+1], e32[0], e32[1], e32[2], length=50, normalize=True, color='r')
+ax.quiver(X1[x_index, y_index+1], Y1[x_index, y_index+1], Z1[x_index, y_index+1], e43[0], e43[1], e43[2], length=50, normalize=True, color='r')
+plt.title('Basis vectors start at the vertex')
 
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+ax.scatter(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], c='k')
+ax.scatter(X1[x_index+ 1, y_index], Y1[x_index+ 1, y_index], Z1[x_index+ 1, y_index], c='b')
+ax.scatter(X1[x_index+ 1, y_index+ 1], Y1[x_index+ 1, y_index+ 1], Z1[x_index+ 1, y_index+ 1], c='k')
+ax.scatter(X1[x_index, y_index+ 1], Y1[x_index, y_index+ 1], Z1[x_index, y_index+ 1], c='r')
+ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], e12[0], e12[1], e12[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index +1, y_index], Y1[x_index+1, y_index], Z1[x_index+1, y_index], e23[0], e23[1], e23[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index+1, y_index+1], Y1[x_index+1, y_index+1], Z1[x_index+1, y_index+1], e34[0], e34[1], e34[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index, y_index+1], Y1[x_index, y_index+1], Z1[x_index, y_index+1], e41[0], e41[1], e41[2], length=50, normalize=True, color='b')
+ax.quiver(X1[x_index, y_index], Y1[x_index, y_index], Z1[x_index, y_index], e41[0], e41[1], e41[2], length=50, normalize=True, color='r')
+ax.quiver(X1[x_index +1, y_index], Y1[x_index+1, y_index], Z1[x_index+1, y_index], e12[0], e12[1], e12[2], length=50, normalize=True, color='r')
+ax.quiver(X1[x_index+1, y_index+1], Y1[x_index+1, y_index+1], Z1[x_index+1, y_index+1], e23[0], e23[1], e23[2], length=50, normalize=True, color='r')
+ax.quiver(X1[x_index, y_index+1], Y1[x_index, y_index+1], Z1[x_index, y_index+1], e34[0], e34[1], e34[2], length=50, normalize=True, color='r')
+plt.title('Using righthand rule in Chen et al.')
 
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 surf5 = ax.plot3D(X1, Y1, Z1)

@@ -15,14 +15,15 @@ def great_circle_dist(lamda_1, lamda_2, phi_1, phi_2, R):
     # Compute the great circle distance in lon-lat coordinates
     return R*np.arccos(np.cos(phi_1)*np.cos(phi_2)*np.cos(lamda_1 - lamda_2) + np.sin(phi_1)*np.sin(phi_2))
 
-def alpha_ijk(p_i, p_j, p_k):
-    # Compute the angle between three points,
-    # which are given by position vectors
-    # in Cartesian space
-    e_ji = np.cross(p_j, p_i)
-    e_jk = np.cross(p_j, p_k)
-    num = np.dot(e_ji, e_jk)
-    denom = np.dot(np.linalg.norm(e_ji), np.linalg.norm(e_jk))
+def alpha_ijk(p_a, p_b, p_c):
+    # Compute the angle between three points a,b,c
+    # with b the centre point.
+    # p_ are position vectors
+    # in 3D Cartesian space
+    e_ba = np.cross(p_b, p_a)
+    e_bc = np.cross(p_b, p_c)
+    num = np.dot(e_ba, e_bc)
+    denom = np.dot(np.linalg.norm(e_ba), np.linalg.norm(e_bc))
 
     return np.arccos(num/denom)
 
@@ -35,12 +36,24 @@ def gnomonic_proj(r, R, x_vals, y_vals, z_vals):
     Z = (R/r)*z_vals
     return X, Y, Z
 
-def grid_properties(C_N, R, X, Y, Z):
+def grid_properties(C_N, R, X, Y, Z, return_alphas=False):
+    # Return properties of the cubed-sphere grid
+    # C_N: number of cells per edge
+    # R: radius
+    # X,Y,Z Cartesian coordinates
+    # return_alphas: Boolean. Whether to alo return alpha values
+
     dx_vals = np.zeros((C_N+1,C_N))
     dy_vals = np.zeros((C_N,C_N+1))
     areas = np.zeros((C_N,C_N))
     chi = np.zeros((C_N,C_N))
     mean_sina = np.zeros((C_N,C_N))
+
+    if return_alphas:
+        alpha_123s = np.zeros((C_N,C_N))
+        alpha_234s = np.zeros((C_N,C_N))
+        alpha_341s = np.zeros((C_N,C_N))
+        alpha_412s = np.zeros((C_N,C_N))
 
     LON, LAT = xyz_to_lon_lat(X, Y, Z)
 
@@ -68,6 +81,12 @@ def grid_properties(C_N, R, X, Y, Z):
                 alpha_341 = alpha_ijk(point3, point4, point1)
                 alpha_412 = alpha_ijk(point4, point1, point2)
 
+                if return_alphas:
+                    alpha_123s[i,j] = alpha_123
+                    alpha_234s[i,j] = alpha_234
+                    alpha_341s[i,j] = alpha_341
+                    alpha_412s[i,j] = alpha_412
+
                 mean_sina[i,j] = (np.sin(alpha_123)+np.sin(alpha_234)+np.sin(alpha_341)+np.sin(alpha_412))/4
             
                 areas[i,j] = (R**2)*(alpha_123+alpha_234+alpha_341+alpha_412 - 2*np.pi)
@@ -79,4 +98,7 @@ def grid_properties(C_N, R, X, Y, Z):
             dy_ave = 0.5*(dy_vals[i,j] + dy_vals[i,j+1])
             chi[i,j] = dy_ave/dx_ave
 
-    return dx_vals, dy_vals, mean_sina, chi, areas
+    if return_alphas:
+        return dx_vals, dy_vals, mean_sina, chi, areas, alpha_123s, alpha_234s, alpha_341s, alpha_412s
+    else:
+        return dx_vals, dy_vals, mean_sina, chi, areas

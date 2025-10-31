@@ -26,19 +26,19 @@ from functions import *
 # 1 is for equidistant
 # 2 is for equiangular
 
-grid_type = 2
+grid_type = 0
 
 # Choose grid for storing prognostic at cell centre
-grid = 'D'
+grid = 'offset'
 
 # Choose the resolution by number of edges
 # on each panel of the cubed-sphere
 # Typically, set this as 2^n, n integer.
-C_N = 96
+C_N = 384
 
 ###########################################
 print('\n')
-print(f'Investigating the {grid}-grid')
+print(f'Investigating the {grid} grid')
 print(f'Resolution of C{C_N}')
 
 R = 6371.220 # Earth's radius in km
@@ -46,7 +46,7 @@ R = 6371.220 # Earth's radius in km
 a = R/np.sqrt(3)
 
 if grid_type == 0:
-    omega_ref = np.asin(1/np.sqrt(3))
+    omega_ref = np.arcsin(1/np.sqrt(3))
     gamma = np.sqrt(2)
     print('Equi-edge cubed sphere')
     grid_name = 'Equi-edge'
@@ -64,27 +64,25 @@ print('\n')
 
 ###############################
 
-# Define the coordinates for the primary or dual mesh.
+# Define the coordinates for the primary or offset grid.
 
-# There are C_N values for the vorticity, which is 
-# stored at cell centres of the D-grid.
+# There are C_N x C_N values for the primary grid.
+# There are (C_N + 1) x (C_N + 1) values on the offset grid
 
-# There are C_N + 1 values for the divergence, which
-# is stored at cell corners.
-
-# The dual grid for divergence is extended to compute
+# The offset grid is extended (by half a grid spacing) to compute
 # cell areas and alpha values.
 
 delta_omega = 2*omega_ref/C_N
-if grid == 'C':
+if grid == 'offset':
     panel_vals = C_N + 1
     # Extend the grid by a half index
     omegas = np.linspace(-omega_ref-delta_omega/2., omega_ref+delta_omega/2., panel_vals + 1)
-elif grid == 'D':
+elif grid == 'primary':
     panel_vals = C_N
     omegas = np.linspace(-omega_ref, omega_ref, panel_vals + 1)
 else:
     print('Incorrect grid type')
+
 
 ################################
 
@@ -100,6 +98,7 @@ ad = np.ones_like(xd)*a
 
 r = np.sqrt(a**2 + xd**2 + yd**2)
 
+
 #######################################
 # Perform an analysis on the first tile:
 X1, Y1, Z1 = gnomonic_proj(r, R, ad, xd, yd)
@@ -107,55 +106,11 @@ X1, Y1, Z1 = gnomonic_proj(r, R, ad, xd, yd)
 # Convert the local Cartesian coordinates to lon-lat
 LON, LAT = xyz_to_lon_lat(X1,Y1,Z1)
 
-dx_vals = np.zeros((panel_vals+1,panel_vals))
-dy_vals = np.zeros((panel_vals,panel_vals+1))
-areas = np.zeros((panel_vals,panel_vals))
-chi = np.zeros((panel_vals,panel_vals))
-
 X1 = np.asarray(X1)
 Y1 = np.asarray(Y1)
 Z1 = np.asarray(Z1)
 
-alpha_123s = np.zeros((panel_vals,panel_vals))
-alpha_234s = np.zeros((panel_vals,panel_vals))
-alpha_341s = np.zeros((panel_vals,panel_vals))
-alpha_412s = np.zeros((panel_vals,panel_vals))
-
-mean_sina = np.zeros((panel_vals,panel_vals))
-
-for i in np.arange(panel_vals + 1):
-    for j in np.arange(panel_vals + 1):
-        if j != panel_vals:
-            dx_vals[i,j] = great_circle_dist(LON[i,j], LON[i, j+1], LAT[i, j], LAT[i, j+1], R)
-        if i != panel_vals:
-            dy_vals[i,j] = great_circle_dist(LON[i,j], LON[i+1, j], LAT[i, j], LAT[i+1, j], R)
-        if i != panel_vals and j != panel_vals:
-            # Compute angles in Cartesian coordinates
-            point1 = np.array([X1[i,j], Y1[i,j], Z1[i,j]])
-            point2 = np.array([X1[i,j+1], Y1[i,j+1], Z1[i,j+1]])
-            point3 = np.array([X1[i+1,j+1], Y1[i+1,j+1], Z1[i+1,j+1]])
-            point4 = np.array([X1[i+1,j], Y1[i+1,j], Z1[i+1,j]])
-
-            alpha_123 = alpha_ijk(point1, point2, point3)
-            alpha_234 = alpha_ijk(point2, point3, point4)
-            alpha_341 = alpha_ijk(point3, point4, point1)
-            alpha_412 = alpha_ijk(point4, point1, point2)
-
-            alpha_123s[i,j] = alpha_123
-            alpha_234s[i,j] = alpha_234
-            alpha_341s[i,j] = alpha_341
-            alpha_412s[i,j] = alpha_412
-
-            mean_sina[i,j] = (np.sin(alpha_123)+np.sin(alpha_234)+np.sin(alpha_341)+np.sin(alpha_412))/4
-        
-            areas[i,j] = (R**2)*(alpha_123+alpha_234+alpha_341+alpha_412 - 2*np.pi)
-
-# Compute chi using average dx and dy vals on either side of cell
-for i in np.arange(panel_vals):
-    for j in np.arange(panel_vals):
-        dx_ave = 0.5*(dx_vals[i,j] + dx_vals[i+1,j])
-        dy_ave = 0.5*(dy_vals[i,j] + dy_vals[i,j+1])
-        chi[i,j] = dy_ave/dx_ave
+dx_vals, dy_vals, mean_sina, chi, areas, alpha_123s, alpha_234s, alpha_341s, alpha_412s = grid_properties(C_N, R, X1, Y1, Z1, return_alphas=True)
 
 print('Minimum length is ', np.min(dx_vals), ' km')
 print('Maximum length is ', np.max(dx_vals), ' km')
@@ -254,6 +209,21 @@ p4 = ax4.pcolormesh(np.sin(alpha_412s), vmin=minmin, vmax=maxmax)
 ax4.set_title('sin(alpha 412)')
 
 cb = plt.colorbar(p4,ax=axes,pad=0.05,shrink=1,format='%.2f')
+
+
+# Check orthogonality at the centre lines of x=y=0
+fig, axes = plt.subplots(2,2, constrained_layout=True)
+(ax1, ax2), (ax3,ax4) = axes
+p1 = ax1.pcolormesh(np.log(1-np.sin(alpha_123s)))
+ax1.set_title('log(1-sin(alpha 123))')
+p2 = ax2.pcolormesh(np.log(1-np.sin(alpha_234s)))
+ax2.set_title('log(1-sin(alpha 234))')
+p3 = ax3.pcolormesh(np.log(1-np.sin(alpha_341s)))
+ax3.set_title('log(1-sin(alpha 341))')
+p4 = ax4.pcolormesh(np.log(1-np.sin(alpha_412s)))
+ax4.set_title('log(1-sin(alpha 412))')
+cb = plt.colorbar(p4,ax=axes,pad=0.05,shrink=1,format='%.2f')
+
 
 ##############################################################
 # Provide some estimates of restriction for divergence damping.
