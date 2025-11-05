@@ -29,12 +29,12 @@ from functions import *
 grid_type = 2
 
 # Choose grid for storing prognostic at cell centre
-grid = 'primary'
+grid = 'offset'
 
 # Choose the resolution by number of edges
 # on each panel of the cubed-sphere
 # Typically, set this as 2^n, n integer.
-C_N = 384
+C_N = 96
 
 ###########################################
 print('\n')
@@ -110,7 +110,7 @@ X1 = np.asarray(X1)
 Y1 = np.asarray(Y1)
 Z1 = np.asarray(Z1)
 
-dx_vals, dy_vals, mean_sina, chi, areas, alpha_123s, alpha_234s, alpha_341s, alpha_412s = grid_properties(C_N, R, X1, Y1, Z1, return_alphas=True)
+dx_vals, dy_vals, mean_sina, chi, areas, alpha_123s, alpha_234s, alpha_341s, alpha_412s = grid_properties(panel_vals, R, X1, Y1, Z1, return_alphas=True)
 
 print('Minimum length is ', np.min(dx_vals), ' km')
 print('Maximum length is ', np.max(dx_vals), ' km')
@@ -228,6 +228,8 @@ cb = plt.colorbar(p4,ax=axes,pad=0.05,shrink=1,format='%.2f')
 ##############################################################
 # Provide some estimates of restriction for divergence damping.
 A_min = np.min(areas)
+
+print(np.shape(areas))
 
 stab = areas/(mean_sina*A_min*f_chi)
 rel_stab = stab-np.min(stab)

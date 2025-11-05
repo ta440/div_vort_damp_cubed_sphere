@@ -2,7 +2,7 @@
 Compare damping over the cubed-sphere
 using the oscillation free coefficient 
 for each mapping.
-
+Use the primary grid here.
 '''
 
 
@@ -26,10 +26,7 @@ C_N = 192
 # Choose the order of damping:
 q = 2
 
-# Diffusion coefficients for each mapping
-# Use the opscillation-free here:
-
-# Offset grid, C96 C192, C384
+# Oscillation-free coefficients
 C_distant = 0.144
 C_angular = 0.117
 C_edge = 0.144
