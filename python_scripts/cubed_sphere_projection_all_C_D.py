@@ -232,6 +232,7 @@ A_min = np.min(areas)
 print(np.shape(areas))
 
 stab = areas/(mean_sina*A_min*f_chi)
+
 rel_stab = stab-np.min(stab)
 
 plt.figure()
@@ -264,5 +265,32 @@ print(f'Von Neumann stability for 6th order is {(2**(1/3))*np.min(stab)/4}')
 print(f'Von Neumann stability for 8th order is {(2**(1/4))*np.min(stab)/4}')
 print(f'Strong stability (not changing sign) for all orders is {np.min(stab)/4}')
 
+
+
+########################
+# Comparison of the full operator:
+stab_full = areas*mean_sina/(A_min*f_chi)
+
+
+rel_stab_full = stab-np.min(stab)
+
+plt.figure()
+plt.pcolormesh(rel_stab_full,cmap='coolwarm', vmin=-0, vmax=np.max(rel_stab))
+plt.title('Stability measure')
+plt.colorbar()
+
+plt.figure()
+plt.pcolormesh(stab_full,cmap='gray_r')
+plt.title('Stability measure')
+plt.colorbar()
+
+plt.figure()
+plt.plot(stab_full[0,:], label='Full operator')
+plt.plot(stab[0,:], label='Pseudo-Laplacian')
+plt.legend()
+plt.title(f'Stability functions over bottom edge \n {grid_name}, {grid}-grid')
+
+print('Minimum of pseudo-Laplacian stability function is', np.min(stab))
+print('Minimum of full Laplacian stability function is', np.min(stab_full))
 
 plt.show()

@@ -39,6 +39,11 @@ if C_N == 96:
     C_distant = 0.144
     C_angular = 0.117
     C_edge = 0.144
+
+    C_distant_full = 0.109
+    C_angular_full = 0.117
+    C_edge_full = 0.109
+
 elif C_N == 192:
     C_distant = 0.144
     C_angular = 0.117
@@ -103,9 +108,9 @@ LON_angular, LAT_angular = xyz_to_lon_lat(X1_angular,Y1_angular,Z1_angular)
 LON_edge, LAT_edge = xyz_to_lon_lat(X1_edge,Y1_edge,Z1_edge)
 
 # Compute cell areas and aspect ratios for the grids:
-dx_vals_distant, dy_vals_distant, mean_sina_distant, chi_distant, areas_distant = grid_properties(C_N, R, X1_distant, Y1_distant, Z1_distant)
-dx_vals_angular, dy_vals_angular, mean_sina_angular, chi_angular, areas_angular = grid_properties(C_N, R, X1_angular, Y1_angular, Z1_angular)
-dx_vals_edge, dy_vals_edge, mean_sina_edge, chi_edge, areas_edge = grid_properties(C_N, R, X1_edge, Y1_edge, Z1_edge)
+dx_vals_distant, dy_vals_distant, mean_sina_distant, mean_cosa_distant, chi_distant, areas_distant = grid_properties(C_N, R, X1_distant, Y1_distant, Z1_distant)
+dx_vals_angular, dy_vals_angular, mean_sina_angular, mean_cosa_angular, chi_angular, areas_angular = grid_properties(C_N, R, X1_angular, Y1_angular, Z1_angular)
+dx_vals_edge, dy_vals_edge, mean_sina_edge, mean_cosa_edge, chi_edge, areas_edge = grid_properties(C_N, R, X1_edge, Y1_edge, Z1_edge)
 
 #########################################
 # Construct panel index space
@@ -114,35 +119,44 @@ x_2d, y_2d = np.meshgrid(x_vals, x_vals)
 
 cent_ind = int(np.floor(C_N/2) - 1)
 
-print(x_2d)
-
 # Slices of x for the different grids:
 inds_diag = np.where(x_2d == y_2d)
 inds_centre = np.where(x_2d == np.floor(C_N/2) - 1)
 
-print(x_2d[inds_diag])
-print(y_2d[inds_diag])
-
-print(x_2d[inds_centre])
-print(y_2d[inds_centre])
 
 # Construct the normalised wavenumbers:
 k_dx = np.linspace(0, np.pi, C_N)
 
 K_DX, X = np.meshgrid(k_dx, x_vals)
 
-def gamma_along_x(q, C_visc, k_dx, sin_a, area, min_area, chi):
-    return 1 - ((4*C_visc*min_area*sin_a/area) * (chi*np.sin(k_dx/2)**2 + (1/chi)*np.sin(k_dx/2)**2) )**q
+# Amplification factor, either from the pseudo-Laplacian
+# or the full curvilinear Laplacian
+def gamma_along_x(q, C_visc, k_dx, sin_a, cos_a, area, min_area, chi, laplacian_option):
+    if laplacian_option == 'pseudo':
+        return 1 - ((4*C_visc*min_area*sin_a/area) * (chi*np.sin(k_dx/2)**2 + (1/chi)*np.sin(k_dx/2)**2) )**q
+    elif laplacian_option == 'full':
+        return 1 - ((4*C_visc*min_area/(area*sin_a)) * (chi*np.sin(k_dx/2)**2 -2*cos_a*np.sin(k_dx/2)*np.sin(k_dx/2)*\
+                                                    np.cos(k_dx/2)*np.cos(k_dx/2)+ (1/chi)*np.sin(k_dx/2)**2) )**q
 
-# Compute dampings
+
+# Compute dampings for the pseudo-Laplacian
 distant_damp = np.zeros((C_N, C_N))
 angular_damp = np.zeros((C_N, C_N))
 edge_damp = np.zeros((C_N, C_N))
 
+# Compute dampings for the full operator
+distant_damp_full = np.zeros((C_N, C_N))
+angular_damp_full = np.zeros((C_N, C_N))
+edge_damp_full = np.zeros((C_N, C_N))
+
 for i in np.arange(C_N):
-    distant_damp[i, :] = gamma_along_x(q, C_distant, k_dx,  mean_sina_distant[i,i], areas_distant[i,i], np.min(areas_distant), chi_distant[i,i])
-    angular_damp[i, :] =  gamma_along_x(q, C_angular, k_dx, mean_sina_angular[cent_ind, i], areas_angular[cent_ind, i], np.min(areas_angular), chi_angular[cent_ind, i])
-    edge_damp[i, :] =  gamma_along_x(q, C_edge, k_dx, mean_sina_edge[i,i], areas_edge[i,i], np.min(areas_edge), chi_edge[i,i])
+    distant_damp[i, :] = gamma_along_x(q, C_distant, k_dx,  mean_sina_distant[i,i], mean_cosa_distant[i,i], areas_distant[i,i], np.min(areas_distant), chi_distant[i,i], 'pseudo')
+    angular_damp[i, :] =  gamma_along_x(q, C_angular, k_dx, mean_sina_angular[cent_ind, i], mean_cosa_angular[i,i], areas_angular[cent_ind, i], np.min(areas_angular), chi_angular[cent_ind, i], 'pseudo')
+    edge_damp[i, :] =  gamma_along_x(q, C_edge, k_dx, mean_sina_edge[i,i], mean_cosa_edge[i,i], areas_edge[i, i], np.min(areas_edge), chi_edge[i,i], 'pseudo')
+
+    distant_damp_full[i, :] = gamma_along_x(q, C_distant_full, k_dx,  mean_sina_distant[i,i], mean_cosa_distant[i,i], areas_distant[i,i], np.min(areas_distant), chi_distant[i,i], 'full')
+    angular_damp_full[i, :] =  gamma_along_x(q, C_angular_full, k_dx, mean_sina_angular[cent_ind, i], mean_cosa_angular[i,i],areas_angular[cent_ind, i], np.min(areas_angular), chi_angular[cent_ind, i], 'full')
+    edge_damp_full[i, :] =  gamma_along_x(q, C_edge_full, k_dx, mean_sina_edge[i,i], mean_cosa_edge[i,i], areas_edge[i,i], np.min(areas_edge), chi_edge[i,i], 'full')
 
 ########################################
 
@@ -166,10 +180,38 @@ fig, axes = plt.subplots(1,3, figsize=(18,5.5), constrained_layout=True, subplot
 surf1 = ax1.plot_surface(K_DX, X, distant_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 surf2 = ax2.plot_surface(K_DX, X, angular_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 surf3 = ax3.plot_surface(K_DX, X, edge_damp, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+
+ax1.set_title('Equidistant')
+ax2.set_title('Equiangular')
+ax3.set_title('Equi-edge')
+plt.suptitle('The pseudo-Laplacian')
+
+for ax in axes:
+    ax.set_zlim(0, 1)
+    ax.set_xlabel(r'$k \Delta x$', labelpad=10)
+    ax.set_ylabel(r'$x$ index', labelpad=10)
+    ax.set_zlabel(r'$\Gamma$')
+
+# All in one.
+fig, axes = plt.subplots(1,3, figsize=(18,5.5), constrained_layout=True, subplot_kw={"projection": "3d"})
+(ax1,ax2,ax3) = axes
+surf1 = ax1.plot_surface(K_DX, X, distant_damp_full, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+surf2 = ax2.plot_surface(K_DX, X, angular_damp_full, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
+surf3 = ax3.plot_surface(K_DX, X, edge_damp_full, cmap=cmap_surface, linewidth=0, vmin=0, vmax=1)
 ax1.set_zlim(0, 1)
 ax2.set_zlim(0, 1)
 ax3.set_zlim(0, 1)
+plt.suptitle('The full Laplacian')
 
+ax1.set_title('Equidistant')
+ax2.set_title('Equiangular')
+ax3.set_title('Equi-edge')
+
+for ax in axes:
+    ax.set_zlim(0, 1)
+    ax.set_xlabel(r'$k \Delta x$', labelpad=10)
+    ax.set_ylabel(r'$x$ index', labelpad=10)
+    ax.set_zlabel(r'$\Gamma$')
 
 
 plt.show()

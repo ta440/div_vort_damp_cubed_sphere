@@ -48,6 +48,7 @@ def grid_properties(C_N, R, X, Y, Z, return_alphas=False):
     areas = np.zeros((C_N,C_N))
     chi = np.zeros((C_N,C_N))
     mean_sina = np.zeros((C_N,C_N))
+    mean_cosa = np.zeros((C_N,C_N))
 
     if return_alphas:
         alpha_123s = np.zeros((C_N,C_N))
@@ -88,6 +89,7 @@ def grid_properties(C_N, R, X, Y, Z, return_alphas=False):
                     alpha_412s[i,j] = alpha_412
 
                 mean_sina[i,j] = (np.sin(alpha_123)+np.sin(alpha_234)+np.sin(alpha_341)+np.sin(alpha_412))/4
+                mean_cosa[i,j] = (np.cos(alpha_123)+np.cos(alpha_234)+np.cos(alpha_341)+np.cos(alpha_412))/4
             
                 areas[i,j] = (R**2)*(alpha_123+alpha_234+alpha_341+alpha_412 - 2*np.pi)
 
@@ -99,6 +101,6 @@ def grid_properties(C_N, R, X, Y, Z, return_alphas=False):
             chi[i,j] = dy_ave/dx_ave
 
     if return_alphas:
-        return dx_vals, dy_vals, mean_sina, chi, areas, alpha_123s, alpha_234s, alpha_341s, alpha_412s
+        return dx_vals, dy_vals, mean_sina, mean_cosa, chi, areas, alpha_123s, alpha_234s, alpha_341s, alpha_412s
     else:
-        return dx_vals, dy_vals, mean_sina, chi, areas
+        return dx_vals, dy_vals, mean_sina, mean_cosa, chi, areas

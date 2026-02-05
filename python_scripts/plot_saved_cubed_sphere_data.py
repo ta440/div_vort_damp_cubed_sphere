@@ -3,12 +3,13 @@ Plots for the paper, using saved data
 from the python script:
 'cubed_sphere_projection_all_C_D.py'
 
-
-'''
-
-'''
 A script to read in saved data about the different cubed-sphere
 grids and to make plots of these.
+
+The results are saved with the convention that 
+D is the primary grid and
+C is the offset grid.
+
 '''
 
 import numpy as np
@@ -23,13 +24,18 @@ from os.path import abspath, dirname
 ##########################################
 # User-defined parameters:
 
+# Save the key figures?
+save_area_fig = True
+save_chi_fig = False
+save_stab_fig = True
+
 # Choose grid for storing prognostic at cell centre
-grid = 'D'
+grid = 'C'
 
 # Choose the resolution by number of edges
 # on each panel of the cubed-sphere
 # Typically, set this as 2^n, n integer.
-C_N = 96
+C_N = 192
 
 label_size=14
 title_size=14
@@ -79,7 +85,7 @@ fig.supxlabel('x cell index', size=label_size)
 ###################################
 
 # What about a single colorbar?
-cmap_choice = 'jet'
+cmap_choice = 'plasma'
 
 minmin = 1400
 maxmax = 3800
@@ -109,18 +115,20 @@ fig.supxlabel('x cell index', size=label_size)
 ###############################
 
 # What about a single colorbar?
-cmap_choice = 'jet'
+cmap_choice = 'viridis'
 cmap = plt.colormaps[cmap_choice]
-cmap.set_under('black')
-cmap.set_over('white')
+#cmap.set_under('black')
+#cmap.set_over('white')
 
+#minmin = 1400
+#maxmax = 3800
 
-minmin = 1400
+minmin = 1000
 maxmax = 3800
 
 conts = np.linspace(minmin,maxmax, 9)
-tick_range = np.linspace(minmin,maxmax, 9)
-norm = colors.BoundaryNorm(conts,ncolors=cmap.N)
+tick_range = np.linspace(minmin,maxmax, 5)
+norm = colors.BoundaryNorm(conts, ncolors=cmap.N)
 
 fig, axes = plt.subplots(1,3, figsize=(12,5), sharey=True, constrained_layout=True)
 (ax1,ax2,ax3) = axes
@@ -134,15 +142,24 @@ ax1.set_title(f'Equidistant \n \n Minimum area of {int(np.round(np.min(distant_a
 ax2.set_title(f'Equiangular \n \n Minimum area of {int(np.round(np.min(angular_areas),0))} km$^2$ \n Maximum area of {int(np.round(np.max(angular_areas),0))} km$^2$', size=title_size)
 ax3.set_title(f'Equi-edge \n \n Minimum area of {int(np.round(np.min(edge_areas),0))} km$^2$ \n Maximum area of {int(np.round(np.max(edge_areas),0))} km$^2$', size=title_size)
 
-cbar = plt.colorbar(plot1,ax=ax3,fraction=0.05, pad=0.04,extend='both')
+cbar = plt.colorbar(plot1,ax=ax3,fraction=0.05, pad=0.04,extend='both', ticks=tick_range)
 cbar.set_label('Cell areas (km$^2$)', size=smaller_size)
 
-ax1.xaxis.set_major_locator(MultipleLocator(25))
-ax2.xaxis.set_major_locator(MultipleLocator(25))
-ax3.xaxis.set_major_locator(MultipleLocator(25))
+if C_N == 192:
+    ax1.yaxis.set_ticks([0,48,96,144,192])
+    ax1.xaxis.set_ticks([0,48,96,144,192])
+    ax2.xaxis.set_ticks([0,48,96,144,192])
+    ax3.xaxis.set_ticks([0,48,96,144,192])
 
-fig.supylabel('y cell index', size=label_size)
-fig.supxlabel('x cell index', size=label_size)
+fig.supylabel('y index', size=label_size)
+fig.supxlabel('x index', size=label_size)
+
+
+
+if save_area_fig:
+    plt.savefig(f'figures/cell_areas_{grid}_C{C_N}', bbox_inches='tight')
+
+
 
 ###########################
 ###########################
@@ -175,6 +192,7 @@ cbar3.set_label('Cell aspect ratio', size=smaller_size)
 fig.supylabel('y cell index', size=label_size)
 fig.supxlabel('x cell index', size=label_size)
 
+
 ###########################
 # What about a single  colorbar?
 
@@ -200,8 +218,18 @@ ax3.set_title(f'Equi-edge \n \n Maximum aspect ratio of {np.round(np.max(edge_ch
 cbar = plt.colorbar(plot1,ticks = tick_range,ax=ax3,fraction=0.05, pad=0.04)
 cbar.set_label('Cell aspect ratio', size=smaller_size)
 
-fig.supylabel('y cell index', size=label_size)
-fig.supxlabel('x cell index', size=label_size)
+if C_N == 192:
+    ax1.yaxis.set_ticks([0,48,96,144,192])
+    ax1.xaxis.set_ticks([0,48,96,144,192])
+    ax2.xaxis.set_ticks([0,48,96,144,192])
+    ax3.xaxis.set_ticks([0,48,96,144,192])
+
+fig.supylabel('y index', size=label_size)
+fig.supxlabel('x index', size=label_size)
+
+
+if save_chi_fig:
+    plt.savefig(f'figures/aspect_ratios_{grid}_C{C_N}',  bbox_inches='tight')
 
 ###########################
 # Plot of the stability function
@@ -235,7 +263,7 @@ fig.supxlabel('x cell index', size=label_size)
 
 ###########################
 # Common colorbar
-cmap_choice = 'jet'
+cmap_choice = 'viridis'
 cmap = plt.colormaps[cmap_choice]
 cmap.set_under('white')
 #cmap.set_over('black')
@@ -262,8 +290,14 @@ ax3.set_title(f'Equi-edge \n \n Minimum value of \u03a8 is {np.round(np.min(edge
 cbar = plt.colorbar(plot1,ax=ax3,fraction=0.05, pad=0.04, extend='both')
 cbar3.set_label('Stability function, \u03a8', size=smaller_size)
 
-fig.supylabel('y cell index', size=label_size)
-fig.supxlabel('x cell index', size=label_size)
+if C_N == 192:
+    ax1.yaxis.set_ticks([0,48,96,144,192])
+    ax1.xaxis.set_ticks([0,48,96,144,192])
+    ax2.xaxis.set_ticks([0,48,96,144,192])
+    ax3.xaxis.set_ticks([0,48,96,144,192])
+
+fig.supylabel('y index', size=label_size)
+fig.supxlabel('x index', size=label_size)
 
 print('Minimum of each stability function')
 print(f'Equidistant: {np.min(distant_stab)}')
@@ -274,5 +308,8 @@ print('Maximum of each stability function')
 print(f'Equidistant: {np.round(np.max(distant_stab),5)}')
 print(f'Equiangular: {np.round(np.max(angular_stab),5)}')
 print(f'Equi-edge: {np.round(np.max(edge_stab),5)}')
+
+if save_stab_fig:
+    plt.savefig(f'figures/stab_function_{grid}_C{C_N}',  bbox_inches='tight')
 
 plt.show()

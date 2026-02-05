@@ -18,7 +18,7 @@ from functions import *
 #####################################
 
 # Save the figure?
-save_the_figure = True
+save_the_figure = False
 
 # Choose the grid resolution:
 C_N = 192
@@ -26,10 +26,23 @@ C_N = 192
 # Choose the order of damping:
 q = 2
 
-# Oscillation-free coefficients
-C_distant = 0.144
-C_angular = 0.117
-C_edge = 0.144
+# Colour scheme
+cmap_surface = 'plasma'
+
+# Choose whether to plot for the pseudo or full Laplacian
+laplacian_option = 'full'
+
+#####################################
+# Oscillation-free coefficients,
+# based off Laplacian option
+if laplacian_option == 'pseudo':
+    C_distant = 0.144
+    C_angular = 0.117
+    C_edge = 0.144
+elif laplacian_option == 'full':
+    C_distant = 0.109
+    C_angular = 0.117
+    C_edge = 0.109
 
 #####################################
 # General grid parameters
@@ -84,26 +97,29 @@ LON_angular, LAT_angular = xyz_to_lon_lat(X1_angular,Y1_angular,Z1_angular)
 LON_edge, LAT_edge = xyz_to_lon_lat(X1_edge,Y1_edge,Z1_edge)
 
 # Compute cell areas and aspect ratios for the grids:
-dx_vals_distant, dy_vals_distant, mean_sina_distant, chi_distant, areas_distant = grid_properties(C_N, R, X1_distant, Y1_distant, Z1_distant)
-dx_vals_angular, dy_vals_angular, mean_sina_angular, chi_angular, areas_angular = grid_properties(C_N, R, X1_angular, Y1_angular, Z1_angular)
-dx_vals_edge, dy_vals_edge, mean_sina_edge, chi_edge, areas_edge = grid_properties(C_N, R, X1_edge, Y1_edge, Z1_edge)
+dx_vals_distant, dy_vals_distant, mean_sina_distant, mean_cosa_distant, chi_distant, areas_distant = grid_properties(C_N, R, X1_distant, Y1_distant, Z1_distant)
+dx_vals_angular, dy_vals_angular, mean_sina_angular, mean_cosa_angular, chi_angular, areas_angular = grid_properties(C_N, R, X1_angular, Y1_angular, Z1_angular)
+dx_vals_edge, dy_vals_edge, mean_sina_edge, mean_cosa_edge, chi_edge, areas_edge = grid_properties(C_N, R, X1_edge, Y1_edge, Z1_edge)
 
+#
 #########################################
 # Construct panel index space
 x_vals = np.arange(C_N)
 x_2d, y_2d = np.meshgrid(x_vals, x_vals)
 
-def two_dx_damp(q, C_visc, sin_a, areas, chis):
-    return 1 - ((4*C_visc*np.min(areas)*sin_a/areas) * (chis + 1/chis) )**q
+def two_dx_damp(q, C_visc, sin_a, areas, chis, laplacian_option):
+    if laplacian_option == 'pseudo':
+        return 1 - ((4*C_visc*np.min(areas)*sin_a/areas) * (chis + 1/chis) )**q
+    elif laplacian_option == 'full':
+        return 1 - ((4*C_visc*np.min(areas)/(areas*sin_a)) * (chis + 1/chis) )**q
 
 # Compute the 2dx wave damping for each cell
-distant_2dx_damp =  two_dx_damp(q, C_distant, mean_sina_distant, areas_distant, chi_distant)
-angular_2dx_damp =  two_dx_damp(q, C_angular, mean_sina_angular, areas_angular, chi_angular)
-edge_2dx_damp =  two_dx_damp(q, C_edge, mean_sina_edge, areas_edge, chi_edge)
+distant_2dx_damp =  two_dx_damp(q, C_distant, mean_sina_distant, areas_distant, chi_distant, laplacian_option)
+angular_2dx_damp =  two_dx_damp(q, C_angular, mean_sina_angular, areas_angular, chi_angular, laplacian_option)
+edge_2dx_damp =  two_dx_damp(q, C_edge, mean_sina_edge, areas_edge, chi_edge, laplacian_option)
 
 ########################################
 
-cmap_surface = 'jet'
 big_size=18
 smaller_size=18
 tick_size = 14
@@ -141,11 +157,18 @@ for ax in axes:
 
     ax.set_xlabel(f'$x$ index', size=smaller_size, labelpad=10)
     ax.set_ylabel(f'$y$ index', size=smaller_size, labelpad=10)
-    ax.set_zlabel('$\Gamma(\pi, \pi)$', size=smaller_size, labelpad=10)
 
-ax1.set_title(f'Equidistant \n max($\Gamma(\pi, \pi)$) = {np.max(distant_2dx_damp):.3f}', size=big_size)
-ax2.set_title(f'Equiangular \n max($\Gamma(\pi, \pi)$) = {np.max(angular_2dx_damp):.3f}', size=big_size)
-ax3.set_title(f'Equi-edge \n max($\Gamma(\pi, \pi)$) = {np.max(edge_2dx_damp):.3f}', size=big_size)
+if laplacian_option == 'full':
+    ax1.set_title(f'Equidistant \n max($\Gamma(\pi, \pi)$) = {np.max(distant_2dx_damp):.3f}', size=big_size)
+    ax2.set_title(f'Equiangular \n max($\Gamma(\pi, \pi)$) = {np.max(angular_2dx_damp):.3f}', size=big_size)
+    ax3.set_title(f'Equi-edge \n max($\Gamma(\pi, \pi)$) = {np.max(edge_2dx_damp):.3f}', size=big_size)
+    ax.set_zlabel('$\Gamma(\pi, \pi)$', size=smaller_size, labelpad=10)
+elif laplacian_option == 'pseudo':
+    ax1.set_title(f'Equidistant \n max($\widetilde\Gamma(\pi, \pi)$) = {np.max(distant_2dx_damp):.3f}', size=big_size)
+    ax2.set_title(f'Equiangular \n max($\widetilde\Gamma(\pi, \pi)$) = {np.max(angular_2dx_damp):.3f}', size=big_size)
+    ax3.set_title(f'Equi-edge \n max($\widetilde\Gamma(\pi, \pi)$) = {np.max(edge_2dx_damp):.3f}', size=big_size)
+    ax.set_zlabel('$\widetilde\Gamma(\pi, \pi)$', size=smaller_size, labelpad=10)
+
 
 plt.subplots_adjust(wspace=0.3, hspace=0.2, left=0.05, right=0.95)
 
@@ -168,6 +191,7 @@ plot3 = ax3.contourf(x_2d, y_2d, edge_2dx_damp, cmap=cmap, levels=conts, norm=no
 ax1.set_aspect(1)
 ax2.set_aspect(1)
 ax3.set_aspect(1)
+
 cbar = plt.colorbar(plot3, ticks = conts, ax=ax3,fraction=0.05, pad=0.05)
 
 print(np.min(distant_2dx_damp), np.max(distant_2dx_damp))

@@ -35,7 +35,7 @@ C8 = 0.15
 # Option 0 is equi-edge
 # This is following the fv3 naming convention
 
-projection_opt = 2
+projection_opt = 1
 
 # Use exact values - close enough
 if projection_opt == 1:
@@ -51,7 +51,7 @@ elif projection_opt == 0:
     sin_a = np.sqrt(3)/2
     grid_name = 'Equi-edge'
 
-C_val = 'default'
+C_val = 'strong'
 
 # Divergence damping coefficients:
 if C_val == 'default':
