@@ -17,9 +17,6 @@ import argparse
 import xarray as xr
 import matplotlib.colors as colors
 import metpy
-import cartopy.crs as ccrs
-
-from tomplot_cubed_sphere import *
 
 # Need to use metpy for fv3!
 
@@ -27,21 +24,25 @@ from tomplot_cubed_sphere import *
 # User definitions
 ################################
 
-case1 = 'cam_6_4_050_baro_dry_fv3_C96_L30_equi_edge'
-case2 = 'cam_6_4_050_baro_dry_fv3_C96_L30_equi_angular'
+case1 = 'cam_6_4_050_held_suarez_fv3_C96_divdamp'
+case2 = 'cam_6_4_050_held_suarez_fv3_C96_equiangular_divdamp'
 
-nc_file1 = case1 + '.cam.h0i.0001-01-01-00000_6th_div_damp_d4bg_0.185.regrid.1x1.nc'
-nc_file2 = case2 + '.cam.h0i.0001-01-01-00000_6th_divdamp_d4bg_0.154_38steps.regrid.1x1.nc'
+nc_file1 = case1 + '.cam.h0i.0001-12-27-01800_sixth_order_blowup_41_steps.regrid.1x1.nc'
+
+#nc_file2 = case2 + '.cam.h0i.0001-12-27-01800_fourth_order_blowup_39steps.regrid.1x1.nc'
+nc_file2 = case2 + '.cam.h0i.0001-12-27-01800_sixth_order_blowup_25steps.regrid.1x1.nc'
 
 # Path to where the plots are saved
 output_ext = 'grid_comps/'
+
+ext_name = ''#'fourth-order'
 
 # Field to compare
 field = 'OMEGA850'
 
 # Time index to compare
-t_idx1 = 30
-t_idx2 = 38
+t_idx1 = -1
+t_idx2 = -1
 
 # Choice of colormap
 cmap_choice = 'plasma'
@@ -95,24 +96,25 @@ LON2, LAT2 = np.meshgrid(lon2, lat2)
 
 ###################################
 
-fig, axes = plt.subplots(1,2, figsize = (9,3), sharey=True, constrained_layout=True, subplot_kw={'projection': ccrs.PlateCarree()})
+fig, axes = plt.subplots(1,2, figsize = (9,3), sharey=True, constrained_layout=True)
 (ax1,ax2) = axes
 
-conts = np.linspace(-1.0,1.0,9)
-tick_range = np.linspace(-1.0, 1.0, 5)
+max_omega = 0.4
 
-lat_ticks = np.linspace(-90,90,5)
-lon_ticks = np.linspace(-180,180,9)
+conts = np.linspace(-max_omega, max_omega,9)
+tick_range = np.linspace(-max_omega, max_omega, 5)
+
+lon_ticks = np.linspace(0,350,8)
 
 cmap = plt.colormaps[cmap_choice]
 cmap.set_under('black')
 cmap.set_over('black')
 
-plot_cubed_sphere_panels(ax1, units='deg', shift_fact=-10, color='white', linewidth=0.5)
-plot_cubed_sphere_panels(ax2, units='deg', shift_fact=-10, color='white', linewidth=0.5)
-
 plot1 = ax1.contourf(LON1, LAT1, field1, levels=conts, cmap=cmap, extend='both')
 plot2 = ax2.contourf(LON2, LAT2, field2, levels=conts, cmap=cmap, extend='both')
+
+#plot1 = ax1.contourf(LON1, LAT1, field1, cmap=cmap, extend='both')
+#plot2 = ax2.contourf(LON2, LAT2, field2, cmap=cmap, extend='both')
 
 ax1.set_aspect('equal')
 ax2.set_aspect('equal')
@@ -120,7 +122,6 @@ ax2.set_aspect('equal')
 fig.supylabel('Latitude (deg)')
 fig.supxlabel('Longitude (deg)')
 
-ax1.set_yticks(lat_ticks)
 ax1.set_xticks(lon_ticks)
 ax2.set_xticks(lon_ticks)
 
@@ -130,8 +131,8 @@ cb.set_label(r"$\omega$ (Pa s$^{-1}$) ")
 ax1.set_title(f'Equi-edge')
 ax2.set_title(f'Equiangular')
 
-
-savename = output_file+f'compare_grids_baro_wave_{field}_with_edges.jpg'
+savename = output_file+f'HS1994_compare_grids_blowup_{ext_name}_{field}.jpg'
 
 print(f'saving file to {savename}')
+plt.savefig(savename, bbox_inches='tight', pad_inches=0.1)
 plt.savefig(savename, bbox_inches='tight', pad_inches=0.1)
