@@ -2,6 +2,7 @@
 A plotting script to compare divergence damping instabilities
 on the equiangular and equi-edge grids, for the JW2006 
 baroclinic wave test.
+Plot the cubed-sphere panel edges, also.
 '''
 
 import numpy as np
@@ -12,6 +13,10 @@ import argparse
 import xarray as xr
 import matplotlib.colors as colors
 import metpy
+
+import cartopy.crs as ccrs
+
+from tomplot_cubed_sphere import *
 
 # Need to use metpy for fv3!
 
@@ -36,8 +41,7 @@ t_idx1 = 30
 t_idx2 = 38
 
 # Choice of colormap
-cmap_choice = 'jet'
-diff_cmap = 'gray_r'
+cmap_choice = 'plasma'
 
 ###############################
 # Directory stuff
@@ -73,6 +77,9 @@ lat1 = nc1['lat'][:]
 lon1 = nc1['lon'][:] 
 lev1 = nc1['lev'][:]
 
+print(nc1['time'][:])
+print(nc2['time'][:])
+
 lat2 = nc2['lat'][:] 
 lon2 = nc2['lon'][:] 
 lev2 = nc2['lev'][:]
@@ -85,17 +92,21 @@ LON2, LAT2 = np.meshgrid(lon2, lat2)
 
 ###################################
 
-fig, axes = plt.subplots(1,2, figsize = (9,3), sharey=True, constrained_layout=True)
+fig, axes = plt.subplots(1,2, figsize = (9,3), sharey=True, constrained_layout=True, subplot_kw={'projection': ccrs.PlateCarree()})
 (ax1,ax2) = axes
 
 conts = np.linspace(-1.0,1.0,9)
 tick_range = np.linspace(-1.0, 1.0, 5)
 
-lon_ticks = np.linspace(0,350,8)
+lat_ticks = np.linspace(-90,90,5)
+lon_ticks = np.linspace(-180,180,9)
 
 cmap = plt.colormaps[cmap_choice]
 cmap.set_under('black')
 cmap.set_over('black')
+
+plot_cubed_sphere_panels(ax1, units='deg', shift_fact=-10, color='white', linewidth=0.5)
+plot_cubed_sphere_panels(ax2, units='deg', shift_fact=-10, color='white', linewidth=0.5)
 
 plot1 = ax1.contourf(LON1, LAT1, field1, levels=conts, cmap=cmap, extend='both')
 plot2 = ax2.contourf(LON2, LAT2, field2, levels=conts, cmap=cmap, extend='both')
@@ -106,6 +117,7 @@ ax2.set_aspect('equal')
 fig.supylabel('Latitude (deg)')
 fig.supxlabel('Longitude (deg)')
 
+ax1.set_yticks(lat_ticks)
 ax1.set_xticks(lon_ticks)
 ax2.set_xticks(lon_ticks)
 
@@ -115,7 +127,8 @@ cb.set_label(r"$\omega$ (Pa s$^{-1}$) ")
 ax1.set_title(f'Equi-edge')
 ax2.set_title(f'Equiangular')
 
-savename = output_file+f'compare_grids_{field}.jpg'
+
+savename = output_file+f'compare_grids_baro_wave_{field}_with_edges.jpg'
 
 print(f'saving file to {savename}')
 plt.savefig(savename, bbox_inches='tight', pad_inches=0.1)
